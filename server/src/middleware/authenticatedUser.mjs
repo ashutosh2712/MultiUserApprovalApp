@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { Users } from "../schemas/Users.mjs";
+import User from "../models/user.mjs";
 
 const jwtSecret =
   "20741f1747b01f13a45dfcac48dcf33a96d242a8a365b0edc20c92d3a4936c21";
@@ -16,7 +16,7 @@ const authenticatedUser = async (request, response, next) => {
     const decoded = jwt.verify(token, jwtSecret);
     request.user = decoded;
 
-    const user = await Users.findById(request.user.userId);
+    const user = await User.findById(request.user.userId);
 
     if (!user) {
       return response.status(404).json({ message: "User not found" });

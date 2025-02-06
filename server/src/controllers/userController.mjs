@@ -2,6 +2,9 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/user.mjs";
 
+const jwtSecret =
+  "20741f1747b01f13a45dfcac48dcf33a96d242a8a365b0edc20c92d3a4936c21";
+
 export const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -23,7 +26,7 @@ export const login = async (req, res) => {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ id: user.id }, "secretkey", { expiresIn: "1h" });
+    const token = jwt.sign({ id: user.id }, jwtSecret, { expiresIn: "1h" });
     res.json({ token });
   } catch (error) {
     res.status(500).json({ error: "Login failed" });

@@ -13,8 +13,8 @@ const app = express();
 app.use(express.json());
 
 // Define routes
-app.use("api/users", userRoutes);
-app.use("api/tasks", taskRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/tasks", taskRoutes);
 
 // Set up the server port
 const PORT = process.env.PORT || 3000;
@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 3000;
 sequelize
   .sync()
   .then(() => {
-    console.log("Database synced successfully");
+    console.log("Database synced successfully!");
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
       console.log(`http://localhost:${PORT}/`);

@@ -46,3 +46,5 @@ export const fetchNotifications = (token) =>
   api.get("/api/tasks/notifications", {
     headers: { Authorization: `Bearer ${token}` },
   });
+
+export const fetchUsers = () => api.get("/api/users");

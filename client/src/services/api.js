@@ -23,10 +23,10 @@ export const createTask = (data, token) =>
     headers: { Authorization: `Bearer ${token}` },
   });
 
-export const approveTask = (taskId, token) =>
+export const approveTask = (taskId, token, comment) =>
   api.post(
     "/api/tasks/approve",
-    { taskId },
+    { taskId, comment },
     { headers: { Authorization: `Bearer ${token}` } }
   );
 

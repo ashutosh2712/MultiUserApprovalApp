@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 const CreateTask = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [users, setUsers] = useState([]); // ✅ Store list of users
-  const [approvers, setApprovers] = useState([]); // ✅ Store selected approvers
+  const [users, setUsers] = useState([]); //  Store list of users
+  const [approvers, setApprovers] = useState([]); //  Store selected approvers
   const navigate = useNavigate();
 
   useEffect(() => {

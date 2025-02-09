@@ -10,8 +10,12 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await loginUser({ email, password });
-      localStorage.setItem("token", data.token);
+      const response = await loginUser({ email, password });
+      const { token, user } = response.data;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("userId", user.id);
+
       navigate("/dashboard");
     } catch (error) {
       alert("Login failed!");

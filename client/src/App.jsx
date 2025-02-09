@@ -5,6 +5,8 @@ import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+import CreateTask from "./pages/CreateTask";
+import TaskDetails from "./pages/TaskDetails";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +29,14 @@ const router = createBrowserRouter([
       {
         path: "/dashboard",
         element: <Dashboard />,
+      },
+      {
+        path: "/create-task",
+        element: <CreateTask />,
+      },
+      {
+        path: "/task/:taskId",
+        element: <TaskDetails />,
       },
     ],
   },

@@ -14,7 +14,10 @@ export const loginUser = (data) => api.post("/api/users/login", data);
 export const signupUser = (data) => api.post("/api/users/signup", data);
 
 // Task APIs
-export const fetchTasks = () => api.get("/api/tasks");
+export const fetchTasks = (token) =>
+  api.get("/api/tasks", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 export const createTask = (data, token) =>
   api.post("/api/tasks/create", data, {
     headers: { Authorization: `Bearer ${token}` },
@@ -27,7 +30,10 @@ export const approveTask = (taskId, token) =>
     { headers: { Authorization: `Bearer ${token}` } }
   );
 
-export const fetchTaskDetails = (taskId) => api.get(`/api/tasks/${taskId}`);
+export const fetchTaskDetails = (taskId, token) =>
+  api.get(`/api/tasks/${taskId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
 export const addComment = (taskId, comment, token) =>
   api.post(

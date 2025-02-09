@@ -3,7 +3,11 @@ import "./App.css";
 function App() {
   return (
     <>
-      <h1>Multi user approval App</h1>
+      <div className="flex min-h-screen items-center justify-center bg-gray-900 text-white">
+        <h1 className="text-4xl font-bold text-blue-400">
+          Tailwind CSS is Working! 🎉
+        </h1>
+      </div>
     </>
   );
 }

@@ -1,7 +1,5 @@
 import { DataTypes } from "sequelize";
 import sequelize from "./db.mjs";
-import User from "./user.mjs";
-import Task from "./task.mjs";
 
 const Approval = sequelize.define("Approval", {
   id: {
@@ -14,7 +12,4 @@ const Approval = sequelize.define("Approval", {
   comment: { type: DataTypes.TEXT, allowNull: true },
 });
 
-Approval.belongsTo(Task, { foreignKey: "taskId" });
-Approval.belongsTo(User, { foreignKey: "approvedBy" });
-
-export default Approval;
+export default Approval; // Do not define associations here

@@ -2,23 +2,83 @@ import Task from "../models/task.mjs";
 import Approval from "../models/approval.mjs";
 import User from "../models/user.mjs";
 import Comment from "../models/comment.mjs";
-import { sendApprovalEmail } from "../utils/sendApprovalEmail.mjs";
+import {
+  sendApprovalEmail,
+  sendApprovingEmail,
+} from "../utils/sendApprovalEmail.mjs";
 import Notification from "../models/notification.mjs";
+import { io } from "../index.mjs";
+
+export const getAllTasks = async (req, res) => {
+  try {
+    const tasks = await Task.findAll({
+      include: [
+        { model: User, as: "creator", attributes: ["id", "name", "email"] },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+    res.status(200).json(tasks);
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getTaskById = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    // console.log("taskId:", taskId);
+    const task = await Task.findByPk(taskId, {
+      include: [
+        { model: User, as: "creator", attributes: ["id", "name", "email"] },
+        {
+          model: Approval,
+          as: "approvals",
+          include: [
+            { model: User, as: "approver", attributes: ["id", "name"] },
+          ], // ✅ Ensure correct alias
+        },
+        {
+          model: Comment,
+          as: "comments",
+          include: [
+            { model: User, as: "commenter", attributes: ["id", "name"] },
+          ],
+        },
+      ],
+    });
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+    // console.log("Task API Response:", JSON.stringify(task, null, 2));
+    res.status(200).json(task);
+  } catch (error) {
+    console.error("Error fetching task details:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 export const createTask = async (req, res) => {
   try {
     const { title, description, approvers } = req.body;
+    // console.log("req.body:", req.body);
     const task = await Task.create({
       title,
       description,
       createdBy: req.user.id,
     });
 
-    // Send email notifications to approvers
-    console.log(`Notify ${approvers.join(", ")} about task approval`);
+    if (approvers.length > 0) {
+      approvers.forEach(async (email) => {
+        await sendApprovingEmail(email, task.title);
+      });
+      console.log(`✅ Email notifications sent to: ${approvers.join(", ")}`);
+    }
 
     res.status(201).json({ message: "Task created", task });
   } catch (error) {
+    console.log("Error creating task:", error);
     res.status(500).json({ error: "Error creating task" });
   }
 };
@@ -48,11 +108,19 @@ export const approveTask = async (req, res) => {
     await Approval.create({ taskId, approvedBy: userId, comment });
 
     // Notify the task creator that someone signed off
-    await Notification.create({
+    const notification = await Notification.create({
       userId: task.createdBy,
       taskId,
       message: `User ${req.user.name} approved your task: "${task.title}".`,
     });
+
+    // Send real-time WebSocket notification to the task creator
+    io.emit(`notify-${task.createdBy}`, notification); //
+
+    console.log(
+      ` Sent notification to notify-${task.createdBy}:`,
+      notification
+    );
 
     // Count the number of approvals
     const approvalsCount = await Approval.count({ where: { taskId } });
@@ -65,13 +133,13 @@ export const approveTask = async (req, res) => {
       const taskCreator = await User.findByPk(task.createdBy);
       const approvers = await Approval.findAll({
         where: { taskId },
-        include: [User],
+        include: [{ model: User, as: "approver" }], // Use the alias
       });
 
       // Notify all parties via email
       const emailRecipients = [
         taskCreator.email,
-        ...approvers.map((a) => a.User.email),
+        ...approvers.map((a) => a.approver.email), // Use "approver" alias
       ];
 
       await sendApprovalEmail(emailRecipients, task.title);

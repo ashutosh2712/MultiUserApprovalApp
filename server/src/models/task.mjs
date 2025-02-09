@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import sequelize from "./db.mjs";
-import User from "./user.mjs";
 
 const Task = sequelize.define("Task", {
   id: {
@@ -17,6 +16,4 @@ const Task = sequelize.define("Task", {
   createdBy: { type: DataTypes.UUID, allowNull: false },
 });
 
-Task.belongsTo(User, { foreignKey: "createdBy" });
-
-export default Task;
+export default Task; //

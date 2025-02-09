@@ -27,8 +27,22 @@ export const login = async (req, res) => {
     }
 
     const token = jwt.sign({ id: user.id }, jwtSecret, { expiresIn: "1h" });
-    res.json({ token });
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: { id: user.id, name: user.name, email: user.email }, // ✅ Send user ID
+    });
   } catch (error) {
     res.status(500).json({ error: "Login failed" });
+  }
+};
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.findAll({ attributes: ["id", "name", "email"] });
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
